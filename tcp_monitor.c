@@ -1,5 +1,3 @@
-// tcp_monitor.c
-
 #include <bpf/libbpf.h>
 #include <stdio.h>
 #include <signal.h>
@@ -7,19 +5,22 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define TASK_COMM_LEN 16
+
 static volatile bool exiting = false;
 
 struct conn_info 
 {
     __u32 pid;
     __u16 dport;
+    char comm[TASK_COMM_LEN];
 };
 
 
 void handle_event(void *ctx, void *data, size_t data_sz) 
 {
     struct conn_info *e = data;
-    printf("PID %d connected to port %d\n", e->pid, e->dport);
+    printf("PID %d (%s) connected to port %d\n", e->pid, e->comm, e->dport);
 }
 
 
@@ -29,7 +30,8 @@ static void sigint_handler(int signo)
 }
 
 
-int main() {
+int main() 
+{
     struct ring_buffer *rb = NULL;
     struct bpf_object *obj;
     struct bpf_program *prog;
@@ -39,7 +41,7 @@ int main() {
     signal(SIGINT, sigint_handler);
 
     obj = bpf_object__open_file("tcp_monitor.bpf.o", NULL);
-    if( libbpf_get_error(obj) )
+    if( libbpf_get_error(obj) ) 
     {
         fprintf(stderr, "Failed to open BPF object\n");
         return 1;
@@ -67,7 +69,7 @@ int main() {
     }
 
     map_fd = bpf_object__find_map_fd_by_name(obj, "events");
-    if( map_fd < 0)  
+    if( map_fd < 0 ) 
     {
         fprintf(stderr, "Failed to find events map\n");
         return 1;
@@ -82,8 +84,8 @@ int main() {
 
     printf("Listening for TCP connections... Press Ctrl+C to exit.\n");
 
-    while( !exiting )
-        ring_buffer__poll(rb, 100 /* timeout, ms */);
+    while (!exiting)
+        ring_buffer__poll(rb, 100);
 
     ring_buffer__free(rb);
     bpf_link__destroy(link);
