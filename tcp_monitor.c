@@ -84,7 +84,7 @@ int main()
 
     printf("Listening for TCP connections... Press Ctrl+C to exit.\n");
 
-    while (!exiting)
+    while( !exiting )
         ring_buffer__poll(rb, 100);
 
     ring_buffer__free(rb);
