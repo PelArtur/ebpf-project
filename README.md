@@ -1,21 +1,21 @@
 # ebpf-project
 
-`vmlinux.h` generation:
-```
-bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h
-```
-
 Compiling:
 
-```
-clang -O2 -g -target bpf -D__TARGET_ARCH_x86 -I./bpf -c tcp_monitor.bpf.c -o tcp_monitor.bpf.o
-```
-
-```
-gcc tcp_monitor.c -o tcp_monitor -lbpf -lelf
+```bash
+make
 ```
 
 Running:
-```
+```bash
 sudo ./tcp_monitor
+```
+
+```
+sudo ./whitelist_cli <command> [args]
+Commands:
+  add <port> <comm>    - Whitelist a process for a port
+  del <port> <comm>    - Remove whitelist for a process on port
+  list                 - List all whitelisted ports
+  list <port>          - Show whitelist for specific port
 ```
