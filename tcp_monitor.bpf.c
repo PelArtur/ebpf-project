@@ -19,8 +19,9 @@ struct {
 } whitelist SEC(".maps");
 
 SEC("kprobe/tcp_connect")
-int BPF_KPROBE(handle_tcp_connect, struct sock *sk) {
-    if (!sk)
+int BPF_KPROBE(handle_tcp_connect, struct sock *sk) 
+{
+    if( !sk )
         return 0;
 
     struct conn_info *info;
@@ -29,9 +30,8 @@ int BPF_KPROBE(handle_tcp_connect, struct sock *sk) {
     bpf_probe_read_kernel(&dport, sizeof(dport), &sk->__sk_common.skc_dport);
     dport = __builtin_bswap16(dport); // convert from network to host byte order
 
-
     info = bpf_ringbuf_reserve(&events, sizeof(*info), 0);
-    if (!info)
+    if( !info )
         return 0;
 
     info->pid = bpf_get_current_pid_tgid() >> 32;

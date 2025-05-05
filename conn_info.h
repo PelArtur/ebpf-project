@@ -1,7 +1,7 @@
 #ifndef CONN_INFO_H
 #define CONN_INFO_H
 
-#define TASK_COMM_LEN 16
+#define TASK_COMM_LEN 64
 #define MAX_WHITELIST 100
 
 struct conn_info {
